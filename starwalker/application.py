@@ -93,6 +93,17 @@ def direction_to_int(direction_value, is_direction=True):
 
         return min(max(int(direction_value), 1), 4)  # 确保在1-4之间
 
+def get_location_by_amap(address, key):
+    url = f'https://restapi.amap.com/v3/geocode/geo?key={key}&address={address}'
+    response = requests.get(url)
+    data = response.json()
+    if data['status'] == '1':
+        lon = data['geocodes'][0]['location'].split(',')[0]
+        lat = data['geocodes'][0]['location'].split(',')[1]
+        return lon, lat
+    else:
+        return None
+
 
 def weather_score(cloudcover, seeing, transparency, lifted_index, rh2m, wind10m_speed, wind10m_direction, temp2m, prec_type):
 
@@ -116,7 +127,7 @@ def weather_score(cloudcover, seeing, transparency, lifted_index, rh2m, wind10m_
 
         'temp2m': 0.05,      # 温度对观测设备操作有间接影响
 
-        'prec_type': 0.05    # 降水类型，雨雾等会严重影响观测
+        'prec_type': 0.01    # 降水类型，雨雾等会严重影响观测
 
     }
 
@@ -157,11 +168,40 @@ def weather_score(cloudcover, seeing, transparency, lifted_index, rh2m, wind10m_
     # 计算加权总分
 
     total_score = sum([weights[key] * value for key, value in locals().items() if key in weights])
+    if prec_type == 4:
 
+        total_score += 0.1  # 晴天额外加分
+
+    elif prec_type == 1:
+
+        total_score -= 1  # 雨天减分
+
+    if cloudcover == 9:
+        total_score -= 1  # 云量大于9时减分
+    elif cloudcover == 8:
+        total_score -= 1
+    elif cloudcover == 7:
+        total_score -= 1
+    elif cloudcover == 6:
+        total_score -= 0.9
+    elif cloudcover == 5:
+        total_score -= 0.8
+    elif cloudcover == 4:
+        total_score -= 0.65
+    elif cloudcover == 3:
+        total_score -= 0.5
+    elif cloudcover == 2:
+        total_score -= 0.4
+    elif cloudcover == 1:
+        total_score += 0.5
+    elif cloudcover == 0:
+        total_score += 1
     
 
-    return round(total_score, 2)
+    # 返回结果
 
+    return round(total_score, 2)
+    
 
 
 def seventimer(lon, lat):
@@ -214,13 +254,13 @@ def describe_weather_condition(score):
 
         return "很好"
 
-    elif 3.9 <= score <= 4.0:
+    elif 3.9 <= score <= 5:
 
         return "极好"
 
     else:
 
-        return "无效的评分，请检查输入是否在0到4之间。"
+        return "无效的评分，请检查输入是否在0到5之间。"
 def print_data_in_2x5_format(data):
     if data:
         current_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
@@ -241,9 +281,15 @@ def print_data_in_2x5_format(data):
             wttrs = weather_score(item['cloudcover'], item['seeing'], item['transparency'], item['lifted_index'], item['rh2m'], item['wind10m']['speed'], item['wind10m']['direction'], item['temp2m'], item['prec_type'])
             print("评分：",        f"{wttrs:<3}"," ",describe_weather_condition(wttrs))
 
+#addr = '北京市海淀区中关村街道'  # 替换为你想要查询的地址
+addr = input("请输入地址：")
+key = 'a878560f304927262d5bb9876989dac4'  # 替换为你的高德地图API密钥
+lon , lat = get_location_by_amap(addr, key)
+print(lon,lat)
+#覆写
 
-lon = 116.39131  # 经度
-lat = 39.90764  # 纬度
+#lon = 116.39131  # 经度
+#lat = 39.90764  # 纬度
 data = seventimer(lon, lat)
 
 print_data_in_2x5_format(data)
