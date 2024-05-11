@@ -7,6 +7,7 @@ import json
 import urllib.parse
 import hashlib
 import urllib
+import time
 def newMoonJudge(year, month, day, hour, minute):
     ts = load.timescale()
     t = ts.utc(year, month, day, hour, minute)
@@ -70,6 +71,98 @@ def precipitation_type_translate(prec_type):
         'hail': '冰雹'
     }
     return prec_type_dict.get(prec_type.lower(), '未知降水类型')
+def direction_to_int(direction_value, is_direction=True):
+
+    """
+
+    假设一个简单的转换逻辑，如果是方向则映射为1-4的等级，1为最不利，4为最有利。
+
+    实际应用中需根据具体情况定义。
+
+    """
+
+    if is_direction:  # 假设风向，简化处理
+
+        if direction_value in ['N', 'S']: return 2  # 北南风作为中等影响
+
+        elif direction_value in ['E', 'W']: return 3  # 东西风稍好
+
+        else: return 4  # 其他（如无风）视为最有利
+
+    else:  # 对于其他参数，假设是直接的数值或已转换为有利等级
+
+        return min(max(int(direction_value), 1), 4)  # 确保在1-4之间
+
+
+def weather_score(cloudcover, seeing, transparency, lifted_index, rh2m, wind10m_speed, wind10m_direction, temp2m, prec_type):
+
+    # 根据天文观测调整权重
+
+    weights = {
+
+        'cloudcover': 0.25,  # 云量对观测影响大
+
+        'seeing': 0.2,       # 视宁度次之
+
+        'transparency': 0.2, # 透明度同样重要
+
+        'lifted_index': 0.05, # 提升指数对天气稳定性有指示，但影响相对小
+
+        'rh2m': 0.05,        # 相对湿度
+
+        'wind10m_speed': 0.1, # 风速影响稳定度
+
+        'wind10m_direction': 0.05, # 风向影响局部条件
+
+        'temp2m': 0.05,      # 温度对观测设备操作有间接影响
+
+        'prec_type': 0.05    # 降水类型，雨雾等会严重影响观测
+
+    }
+
+    
+
+    # 转换输入为评分贡献值
+
+    cloudcover = direction_to_int(cloudcover)
+
+    seeing = direction_to_int(seeing)
+
+    transparency = direction_to_int(transparency)
+
+    lifted_index = direction_to_int(lifted_index, is_direction=False)
+
+    rh2m = direction_to_int(rh2m, is_direction=False)
+
+    wind10m_speed = direction_to_int(wind10m_speed, is_direction=False)
+
+    wind10m_direction = direction_to_int(wind10m_direction)
+
+    temp2m = direction_to_int(temp2m, is_direction=False)
+
+    
+
+    # 降水类型需特别处理，如晴天为最佳，其他按不利程度赋值
+
+    if prec_type == 'none': 
+
+        prec_type = 4
+
+    else: 
+
+        prec_type = 1  # 简化处理，实际可能需要更细致的分类
+
+    
+
+    # 计算加权总分
+
+    total_score = sum([weights[key] * value for key, value in locals().items() if key in weights])
+
+    
+
+    return round(total_score, 2)
+
+
 
 def seventimer(lon, lat):
     url = "https://www.7timer.info/bin/astro.php"
@@ -85,13 +178,57 @@ def seventimer(lon, lat):
     else:
         print("请求失败，状态码：", response.status_code)
         return None
+def describe_weather_condition(score):
 
+    """
+
+    根据天气评分返回对应的天气状况描述。
+
+    :param score: 天气评分，范围通常是0到4。
+
+    :return: 描述天气状况的字符串。
+
+    """
+
+    if 0 <= score < 0.5:
+
+        return "糟糕"
+
+    elif 0.5 <= score < 1.5:
+
+        return "很差"
+
+    elif 1.5 <= score < 2.5:
+
+        return "较差"
+
+    elif 2.5 <= score < 3.5:
+
+        return "尚可"
+
+    elif 3.5 <= score < 3.7:
+
+        return "良好"
+
+    elif 3.7 <= score < 3.9:
+
+        return "很好"
+
+    elif 3.9 <= score <= 4.0:
+
+        return "极好"
+
+    else:
+
+        return "无效的评分，请检查输入是否在0到4之间。"
 def print_data_in_2x5_format(data):
     if data:
+        current_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        print("报告在" + current_time + "生成")
         for i, item in enumerate(data["dataseries"]):
-            if i % 5 == 0:
+            if i % 9 == 0:
                 print()
-            print("时间点：",       f"{item['timepoint']:<3}", end="  ")
+            print("小时后：",       f"{item['timepoint']:<3}", end="  ")
             print("云层覆盖：",    f"{item['cloudcover']:<3}", end="  ")
             print("视宁度：",      f"{item['seeing']:<3}", end="  ")
             print("透明度：",      f"{item['transparency']:<3}", end="  ")
@@ -101,7 +238,9 @@ def print_data_in_2x5_format(data):
             print("风向：",        f"{direction_fullname(item['wind10m']['direction']):<3}", end="  ")
             print("温度：",        f"{item['temp2m']:<3}", end="  ")
             print("预测的降水类型：", f"{precipitation_type_translate(item['prec_type']):<3}")
-            print()
+            wttrs = weather_score(item['cloudcover'], item['seeing'], item['transparency'], item['lifted_index'], item['rh2m'], item['wind10m']['speed'], item['wind10m']['direction'], item['temp2m'], item['prec_type'])
+            print("评分：",        f"{wttrs:<3}"," ",describe_weather_condition(wttrs))
+
 
 lon = 116.39131  # 经度
 lat = 39.90764  # 纬度
