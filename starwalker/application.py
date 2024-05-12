@@ -84,7 +84,7 @@ def geodata():
 
     response = requests.get(url, params=params, headers=headers)
 
-    if code == 200:
+    if response.status_code == 200:
         print(response.text)
         rep = response.text
         data = json.loads(rep)
