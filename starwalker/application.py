@@ -138,21 +138,21 @@ def weather_score(cloudcover, seeing, transparency, lifted_index, rh2m, wind10m_
 
     weights = {
 
-        'cloudcover': 0.25,  # 云量对观测影响大
+        'cloudcover': 1,  # 云量对观测影响大
 
-        'seeing': 0.2,       # 视宁度次之
+        'seeing': 0.3,       # 视宁度次之
 
-        'transparency': 0.2, # 透明度同样重要
+        'transparency': 0.4, # 透明度同样重要
 
-        'lifted_index': 0.05, # 提升指数对天气稳定性有指示，但影响相对小
+        'lifted_index': 0.3, # 提升指数对天气稳定性有指示，但影响相对小
 
-        'rh2m': 0.05,        # 相对湿度
+        'rh2m': -0.05,        # 相对湿度
 
-        'wind10m_speed': 0.1, # 风速影响稳定度
+        'wind10m_speed': -0.1, # 风速影响稳定度
 
-        'wind10m_direction': 0.05, # 风向影响局部条件
+        'wind10m_direction': 0, # 风向影响局部条件
 
-        'temp2m': 0.05,      # 温度对观测设备操作有间接影响
+        'temp2m': 0,      # 温度对观测设备操作有间接影响
 
         'prec_type': 0.01    # 降水类型，雨雾等会严重影响观测
 
