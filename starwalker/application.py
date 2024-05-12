@@ -146,9 +146,9 @@ def weather_score(cloudcover, seeing, transparency, lifted_index, rh2m, wind10m_
 
         'lifted_index': 0.3, # 提升指数对天气稳定性有指示，但影响相对小
 
-        'rh2m': -0.05,        # 相对湿度
+        'rh2m': -0.5,        # 相对湿度
 
-        'wind10m_speed': -0.1, # 风速影响稳定度
+        'wind10m_speed': -0.3, # 风速影响稳定度
 
         'wind10m_direction': 0, # 风向影响局部条件
 
@@ -232,7 +232,7 @@ def weather_score(cloudcover, seeing, transparency, lifted_index, rh2m, wind10m_
 
 
 def seventimer(lon, lat):
-    url = "https://www.7timer.info/bin/astro.php"
+    url = "http://www.7timer.info/bin/astro.php"
     params = {"lon": lon, "lat": lat, "ac": "0", "unit": "metric", "output": "json", "tzshift": "0"}
     headers = {
         'Content-Type': 'application/json'
@@ -316,27 +316,30 @@ def print_data_in_line(data,lat,lon):
                 St = 0.5
             elif angle < 90:
                 phase = "上弦月"
-                St = 1
+                St = 1.5
             elif angle < 135:
                 phase = "盈凸月"
-                St = 1.5
+                St = 1.75
             elif angle < 180:
                 phase = "满月"
-                St = 2
+                St = 2.5
             elif angle < 225:
                 phase = "亏凸月"
-                St = 1.5
+                St = 1.75
             elif angle < 270:
                 phase = "下弦月"
-                St = 1
+                St = 1.5
             elif angle < 315:
                 phase = "残月"
                 St = 0.5
             else:
                 phase = "新月"
                 St = 0
+            if precipitation_type_translate(item['prec_type']) == "雨" or precipitation_type_translate(item['prec_type']) == '雪':
+                St = St + 1
             wttrs = weather_score(item['cloudcover'], item['seeing'], item['transparency'], item['lifted_index'], item['rh2m'], item['wind10m']['speed'], item['wind10m']['direction'], item['temp2m'], item['prec_type'])
-            wttrs -= St
+            
+            wttrs = wttrs - St
             if wttrs < 0:
                 wttrs = 0
             elif wttrs > 5:
