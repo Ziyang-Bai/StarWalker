@@ -8,6 +8,27 @@ import urllib.parse
 import hashlib
 import urllib
 import time
+import ephem
+from datetime import datetime 
+def get_moon_phase(hours_after,lat,lon):
+    # 设置观察者的位置
+    observer = ephem.Observer()
+    observer.lat = lat  # 纬度
+    observer.lon = lon  # 经度
+    observer.date = datetime.now()
+
+    # 计算x个小时后的日期
+    future_date = observer.date + ephem.Date(hours_after * ephem.hour)
+
+    # 计算月相
+    moon = ephem.Moon(future_date)
+    phase = moon.phase
+
+    # 获取月相的名称
+    phase_name = ephem.constellation(moon)
+
+    return phase
+
 def newMoonJudge(year, month, day, hour, minute):
     ts = load.timescale()
     t = ts.utc(year, month, day, hour, minute)
@@ -261,7 +282,7 @@ def describe_weather_condition(score):
     else:
 
         return "无效的评分，请检查输入是否在0到5之间。"
-def print_data_in_2x5_format(data):
+def print_data_in_line(data,lat,lon):
     if data:
         current_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         print("报告在" + current_time + "生成")
@@ -269,6 +290,7 @@ def print_data_in_2x5_format(data):
             if i % 9 == 0:
                 print()
             print("小时后：",       f"{item['timepoint']:<3}", end="  ")
+            print(f'月相：{str(get_moon_phase(item["timepoint"],lat,lon))[:3]}', end="  ")
             print("云层覆盖：",    f"{item['cloudcover']:<3}", end="  ")
             print("视宁度：",      f"{item['seeing']:<3}", end="  ")
             print("透明度：",      f"{item['transparency']:<3}", end="  ")
@@ -279,8 +301,45 @@ def print_data_in_2x5_format(data):
             print("温度：",        f"{item['temp2m']:<3}", end="  ")
             print("预测的降水类型：", f"{precipitation_type_translate(item['prec_type']):<3}")
             wttrs = weather_score(item['cloudcover'], item['seeing'], item['transparency'], item['lifted_index'], item['rh2m'], item['wind10m']['speed'], item['wind10m']['direction'], item['temp2m'], item['prec_type'])
+            angle = get_moon_phase(item["timepoint"],lat,lon)
+            if angle < 1:
+                phase = "新月"
+                St = 0
+            elif angle < 45:
+                phase = "蛾眉月"
+                St = 0.5
+            elif angle < 90:
+                phase = "上弦月"
+                St = 1
+            elif angle < 135:
+                phase = "盈凸月"
+                St = 1.5
+            elif angle < 180:
+                phase = "满月"
+                St = 2
+            elif angle < 225:
+                phase = "亏凸月"
+                St = 1.5
+            elif angle < 270:
+                phase = "下弦月"
+                St = 1
+            elif angle < 315:
+                phase = "残月"
+                St = 0.5
+            else:
+                phase = "新月"
+                St = 0
+            wttrs = weather_score(item['cloudcover'], item['seeing'], item['transparency'], item['lifted_index'], item['rh2m'], item['wind10m']['speed'], item['wind10m']['direction'], item['temp2m'], item['prec_type'])
+            wttrs -= St
+            if wttrs < 0:
+                wttrs = 0
+            elif wttrs > 5:
+                wttrs = 5
+            else:
+                wttrs = round(wttrs, 2)
+                
             print("评分：",        f"{wttrs:<3}"," ",describe_weather_condition(wttrs))
-
+            
 #addr = '北京市海淀区中关村街道'  # 替换为你想要查询的地址
 addr = input("请输入地址：")
 key = 'a878560f304927262d5bb9876989dac4'  # 替换为你的高德地图API密钥
@@ -292,4 +351,4 @@ print(lon,lat)
 #lat = 39.90764  # 纬度
 data = seventimer(lon, lat)
 
-print_data_in_2x5_format(data)
+print_data_in_line(data,lat,lon)
