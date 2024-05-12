@@ -18,6 +18,7 @@ if VERSION == "" or VERSION == None:
     VERSION = "Unknown"
 if COMPILED == "" or COMPILED == None:
     COMPILED = "FALSE"
+image_path = ".\\star_map.png"
 from skyfield.api import load
 from skyfield.framelib import ecliptic_frame
 import requests
@@ -31,6 +32,9 @@ import ephem
 from datetime import datetime 
 import matplotlib.pyplot as plt
 import matplotlib
+from bs4 import BeautifulSoup
+import easygui as eg
+from PIL import Image
 matplotlib.rc("font",family='Microsoft YaHei')
 
 def get_moon_phase(hours_after,lat,lon):
@@ -80,7 +84,7 @@ def geodata():
 
     response = requests.get(url, params=params, headers=headers)
 
-    if response.status_code == 200:
+    if code == 200:
         print(response.text)
         rep = response.text
         data = json.loads(rep)
@@ -247,7 +251,89 @@ def weather_score(cloudcover, seeing, transparency, lifted_index, rh2m, wind10m_
     return round(total_score, 2)
     
 
-
+def responsecode(code):
+        if code == 100:
+            print('继续')
+        elif code == 101:
+            print('切换协议')
+        elif code == 200:
+            print('成功')
+        elif code == 201:
+            print('创建')
+        elif code == 202:
+            print('已接受')
+        elif code == 203:
+            print('非权威信息')
+        elif code == 204:
+            print('无内容')
+        elif code == 205:
+            print('重置内容')
+        elif code == 206:
+            print('部分内容')
+        elif code == 300:
+            print('多重选择')
+        elif code == 301:
+            print('永久移动')
+        elif code == 302:
+            print('找到')
+        elif code == 303:
+            print('查看其他')
+        elif code == 304:
+            print('未修改')
+        elif code == 307:
+            print('临时重定向')
+        elif code == 308:
+            print('永久重定向')
+        elif code == 400:
+            print('错误请求')
+        elif code == 401:
+            print('未授权')
+        elif code == 403:
+            print('禁止')
+        elif code == 404:
+            print('未找到')
+        elif code == 405:
+            print('方法不允许')
+        elif code == 406:
+            print('不可接受')
+        elif code == 407:
+            print('代理授权 required')
+        elif code == 408:
+            print('请求超时')
+        elif code == 409:
+            print('冲突')
+        elif code == 410:
+            print('已删除')
+        elif code == 411:
+            print('长度 required')
+        elif code == 412:
+            print('前置条件失败')
+        elif code == 413:
+            print('负载过大')
+        elif code == 414:
+            print('URI过长')
+        elif code == 415:
+            print('不支持的媒体类型')
+        elif code == 416:
+            print('范围不可满足')
+        elif code == 417:
+            print('期望失败')
+        elif code == 500:
+            print('内部服务器错误')
+        elif code == 501:
+            print('未实现')
+        elif code == 502:
+            print('无效的网关 常见故障 请重试')
+        elif code == 503:
+            print('服务不可用')
+        elif code == 504:
+            print('网关超时')
+        elif code == 505:
+            print('HTTP版本不受支持')
+        else:
+            print('未知状态码')
+        print("请联系开发者以获取帮助")
+        return None
 def seventimer(lon, lat):
     url = "http://www.7timer.info/bin/astro.php"
     params = {"lon": lon, "lat": lat, "ac": "0", "unit": "metric", "output": "json", "tzshift": "0"}
@@ -261,88 +347,9 @@ def seventimer(lon, lat):
         return data
     else:
         print("请求失败，状态码：", response.status_code)
-        if response.status_code == 100:
-            print('继续')
-        elif response.status_code == 101:
-            print('切换协议')
-        elif response.status_code == 200:
-            print('成功')
-        elif response.status_code == 201:
-            print('创建')
-        elif response.status_code == 202:
-            print('已接受')
-        elif response.status_code == 203:
-            print('非权威信息')
-        elif response.status_code == 204:
-            print('无内容')
-        elif response.status_code == 205:
-            print('重置内容')
-        elif response.status_code == 206:
-            print('部分内容')
-        elif response.status_code == 300:
-            print('多重选择')
-        elif response.status_code == 301:
-            print('永久移动')
-        elif response.status_code == 302:
-            print('找到')
-        elif response.status_code == 303:
-            print('查看其他')
-        elif response.status_code == 304:
-            print('未修改')
-        elif response.status_code == 307:
-            print('临时重定向')
-        elif response.status_code == 308:
-            print('永久重定向')
-        elif response.status_code == 400:
-            print('错误请求')
-        elif response.status_code == 401:
-            print('未授权')
-        elif response.status_code == 403:
-            print('禁止')
-        elif response.status_code == 404:
-            print('未找到')
-        elif response.status_code == 405:
-            print('方法不允许')
-        elif response.status_code == 406:
-            print('不可接受')
-        elif response.status_code == 407:
-            print('代理授权 required')
-        elif response.status_code == 408:
-            print('请求超时')
-        elif response.status_code == 409:
-            print('冲突')
-        elif response.status_code == 410:
-            print('已删除')
-        elif response.status_code == 411:
-            print('长度 required')
-        elif response.status_code == 412:
-            print('前置条件失败')
-        elif response.status_code == 413:
-            print('负载过大')
-        elif response.status_code == 414:
-            print('URI过长')
-        elif response.status_code == 415:
-            print('不支持的媒体类型')
-        elif response.status_code == 416:
-            print('范围不可满足')
-        elif response.status_code == 417:
-            print('期望失败')
-        elif response.status_code == 500:
-            print('内部服务器错误')
-        elif response.status_code == 501:
-            print('未实现')
-        elif response.status_code == 502:
-            print('无效的网关 常见故障 请重试')
-        elif response.status_code == 503:
-            print('服务不可用')
-        elif response.status_code == 504:
-            print('网关超时')
-        elif response.status_code == 505:
-            print('HTTP版本不受支持')
-        else:
-            print('未知状态码')
-        print("请联系开发者以获取帮助")
-        return None
+        responsecode(response.status_code)
+
+        
 def describe_weather_condition(score):
 
     """
@@ -492,6 +499,23 @@ def print_data_in_line(data,lat,lon,graph):
         plt.title("观测数据")
         plt.legend()
         plt.show()
+def starchart(lat,lon):
+    url = "http://fourmilab.net/cgi-bin/uncgi/Yoursky?fov=1&lat=35&lon=-105&depm=0&consto=1&imgsize=1000&moonp=1"
+    params = {"fov": "1", "lat": lat, "lon": lon, "depm": "0", "consto": "1", "imgsize": "1000","moonp":"1"}
+    response = requests.get(url, params=params)
+    soup = BeautifulSoup(response.text, "html.parser")
+
+    img_url = soup.find("img")["src"]
+    img_data = requests.get("http://fourmilab.net" + img_url).content
+
+    with open("star_map.png", "wb") as f:
+        f.write(img_data)
+
+
+
+
+
+
 if __name__ == '__main__':            
     #addr = '北京市海淀区中关村街道'  # 替换为你想要查询的地址
     print("StarWalker 星行者")
@@ -514,6 +538,8 @@ if __name__ == '__main__':
         curve = True
     else:
         curve = False
+    ask_starchart = input("是否要生成今日的星图？(y/n)")
+    
     key = 'a878560f304927262d5bb9876989dac4'  # 替换为你的高德地图API密钥
     lon , lat = get_location_by_amap(addr, key)
     print(lon,lat)
@@ -521,6 +547,10 @@ if __name__ == '__main__':
 
     #lon = 116.39131  # 经度
     #lat = 39.90764  # 纬度
+    if ask_starchart == 'y':
+        starchart(lat,lon)
     data = seventimer(lon, lat)
 
     print_data_in_line(data,lat,lon,curve)
+    image = Image.open(image_path)
+    eg.msgbox(image=image_path,title="StarWalker - 星行者-图像预览",msg=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + "的星图")
