@@ -1,4 +1,10 @@
 # -*- coding: utf-8 -*- 
+"""
+@File    :   application.py
+@Time    :   2024/04/15 09:08:03
+@Version :   Dev-0.0
+@Desc    :   None
+"""
 from skyfield.api import load
 from skyfield.framelib import ecliptic_frame
 import requests
