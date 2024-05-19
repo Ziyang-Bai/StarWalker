@@ -4,12 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d88a91da-c0fb-4702-ad23-c63e884bb7ca" name="更改" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/StarWalker.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/StarWalker.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/starwalker/application.py" beforeDir="false" afterPath="$PROJECT_DIR$/starwalker/application.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/starwalker/star_map.png" beforeDir="false" afterPath="$PROJECT_DIR$/starwalker/star_map.png" afterDir="false" />
-    </list>
+    <list default="true" id="d88a91da-c0fb-4702-ad23-c63e884bb7ca" name="更改" comment="The first compiled public test available version" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -103,7 +98,15 @@
       <option name="project" value="LOCAL" />
       <updated>1716089111092</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="The first compiled public test available version">
+      <option name="closed" value="true" />
+      <created>1716096155733</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1716096155733</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -111,6 +114,7 @@
     <MESSAGE value="- 调整代码风格，优化变量命名&#10;- 添加星图预览功能，提升用户体验&#10;- 修改评分系统，调整天气权重&#10;- 增加调试代码说明，设定常量&#10;- 创建月相角评估算法模块" />
     <MESSAGE value="优化请求重试逻辑，增强星图预览功能，调整天气评分权重" />
     <MESSAGE value="增加IP智能定位功能&#10;实测偏移量竟达13km" />
-    <option name="LAST_COMMIT_MESSAGE" value="增加IP智能定位功能&#10;实测偏移量竟达13km" />
+    <MESSAGE value="The first compiled public test available version" />
+    <option name="LAST_COMMIT_MESSAGE" value="The first compiled public test available version" />
   </component>
 </project>
