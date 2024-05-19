@@ -1,0 +1,26 @@
+https://api.waqi.info/feed/ShangHai/?token=b942c287c119d2b28e5e7f52ed2d7519b7280f35
+
+
+
+Looking to test your new credentials right away?
+Checkout demo.astronomyapi.com
+Application Id             de5ab7f5-6405-4632-96ca-0c82ee8a13cf
+Application Secret      
+
+3010c6004b2e20782cdea0693e3103690b496daa994cbc900066e0c91195de91041af810bfaa0526fdab9ec8e85391f884acbba6ff3625dd2a69a0ca3a7afb5fb717ff9aba4f04b2d9a43b586b69af8d7dad3edef096376694b2e68ef988289d2b0711f0af189ac5bb58f047f0002c40
+
+Please note down these credentials somewhere safe, because there's no way to retrieve them after you navigate away. 
+
+Nasa.Gov
+h34W6HWCCdgZvL2hmSUzsHw2KlaAxwCysCwsDw7c
+
+心知天气
+公钥
+PVBY4y_288RpJBXsS
+私钥
+Svcnt0HcBxlWs2kVF
+amap
+StarWalker	f4df147bc1194ff55c27828bdcb2b70e	9dd61e69075d64e279d8269de4d8b3b1
+
+mapbaidu
+eu95OKyRj48ivKO2FHgMnRhRFf6U76sm
