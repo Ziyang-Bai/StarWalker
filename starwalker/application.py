@@ -6,7 +6,7 @@
 @Desc    :   None
 @Branch  :   Feature-Forward
 """
-
+import os
 from datetime import datetime
 from PIL import Image
 import easygui as eg
@@ -24,9 +24,9 @@ import requests
 from skyfield.framelib import ecliptic_frame
 from skyfield.api import load
 AUTHOR = "JINGJIAN"
-BRATCH = "Feature-Forward"
-VERSION = "Dev-12c"
-COMPILED = "FALSE"
+BRATCH = "LegacyGUI"
+VERSION = "Alpha-24w01a>userdebug:Rv0.1L"
+COMPILED = "TRUE"
 if AUTHOR == "" or AUTHOR is None:
     AUTHOR = "JINGJIAN"
 if BRATCH == "" or BRATCH is None:
@@ -440,7 +440,7 @@ def describe_weather_condition(score):
         return "无效的评分，请检查输入是否在0到5之间。"
 
 
-def print_data_in_line(data, lat, lon, graph):
+def make_report(data, lat, lon, graph):
     timepoint = []
     lunarphase = []
     cloudcover = []
@@ -452,37 +452,62 @@ def print_data_in_line(data, lat, lon, graph):
     temp2m = []
     score_list = []
     if data:
+        f = open("report.txt", "a", encoding="utf-8")
         current_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         print("报告在" + current_time + "生成")
+        f.write("报告在" + current_time + "生成\n")
+        f.close()
         for i, item in enumerate(data["dataseries"]):
+
             if i % 9 == 0:
                 print()
+                f = open("report.txt", "a", encoding="utf-8")
+                f.close()
+            f = open("report.txt", "a", encoding="utf-8")
             print("小时后：", f"{item['timepoint']:<3}", end="  ")
+            f.write("小时后：" + f"{item['timepoint']:<3}" + "  ")
             timepoint.append(item['timepoint'])
             print(
                 f'月相：{str(get_moon_phase(item["timepoint"],lat,lon))[:3]}',
                 end="  ")
+            f.write(
+                f'月相：{str(get_moon_phase(item["timepoint"],lat,lon))[:3]}' +
+                "  ")
             lunarphase.append(get_moon_phase(item["timepoint"], lat, lon))
             print("云层覆盖：", f"{item['cloudcover']:<3}", end="  ")
+            f.write("云层覆盖：" + f"{item['cloudcover']:<3}" + "  ")
             cloudcover.append(item['cloudcover'])
             print("视宁度：", f"{item['seeing']:<3}", end="  ")
+            f.write("视宁度：" + f"{item['seeing']:<3}" + "  ")
             seeing.append(item['seeing'])
             print("透明度：", f"{item['transparency']:<3}", end="  ")
+            f.write("透明度：" + f"{item['transparency']:<3}" + "  ")
             transparency.append(item['transparency'])
             print("提升指数：", f"{item['lifted_index']:<3}", end="  ")
+            f.write("提升指数：" + f"{item['lifted_index']:<3}" + "  ")
             lifted_index.append(item['lifted_index'])
             print("相对湿度：", f"{item['rh2m']:<3}", end="  ")
+            f.write("相对湿度：" + f"{item['rh2m']:<3}" + "  ")
             rh2m.append(item['rh2m'])
             print("风速：", f"{item['wind10m']['speed']:<3}", end="  ")
+            f.write("风速：" + f"{item['wind10m']['speed']:<3}" + "  ")
             wind10m_speed.append(item['wind10m']['speed'])
             print(
                 "风向：",
                 f"{direction_fullname(item['wind10m']['direction']):<3}",
                 end="  ")
+            f.write(
+                "风向：" +
+                f"{direction_fullname(item['wind10m']['direction']):<3}" +
+                "  ")
             print("温度：", f"{item['temp2m']:<3}", end="  ")
+            f.write("温度：" + f"{item['temp2m']:<3}" + "  ")
             temp2m.append(item['temp2m'])
             print(
                 "预测的降水类型：",
+                f"{precipitation_type_translate(item['prec_type']):<3}")
+            f.write(
+                "预测的降水类型：" +
                 f"{precipitation_type_translate(item['prec_type']):<3}")
             wttrs = weather_score(
                 item['cloudcover'],
@@ -546,7 +571,19 @@ def print_data_in_line(data, lat, lon, graph):
                 wttrs = round(wttrs, 2)
 
             print("评分：", f"{wttrs:<3}", " ", describe_weather_condition(wttrs))
+            f.write(
+                "评分：" +
+                f"{wttrs:<3}" +
+                "  " +
+                describe_weather_condition(wttrs) +
+                "\n")
+            f.close()
+            # 使用MSGbox显示数据
             score_list.append(wttrs)
+    with open("report.txt", "r", encoding="utf-8") as f:
+        content = f.read()
+
+    eg.msgbox(content, "StarWalker")
     if graph:
         """
         timepoint = []X
@@ -607,14 +644,28 @@ def starchart(lat, lon):
 
 
 if __name__ == '__main__':
+    if os.path.exists("report.txt"):
+        # 如果文件存在，打开文件并清空内容
+        with open("report.txt", "r+", encoding="utf-8") as f:
+            f.read()
+            f.seek(0)
+            f.truncate()
+    else:
+        # 如果文件不存在，创建文件
+        with open("report.txt", "w", encoding="utf-8") as f:
+            pass
+    # 显示欢迎信息
+    eg.msgbox(
+        f"欢迎使用StarWalker星行者\n分支：{BRATCH}\n版本：{VERSION}\n作者：{AUTHOR}\n编译：{COMPILED}",
+        image="starwalker - Copy.bmp")
     # addr = '北京市海淀区中关村街道'  # 替换为你想要查询的地址
     print("StarWalker 星行者")
     print("分支 ", BRATCH)
     print("版本 ", VERSION)
     print("作者 ", AUTHOR)
     print("编译 ", COMPILED)
-    addr = input("请输入查询地址（不填写则请在下一个输入框中输入经纬度坐标 填写<ip>使用智能IP定位）：")
-    if addr == "":
+    choicen = eg.choicebox("请选择查询方式", choices=["使用IP定位", "使用经纬度定位", "使用地址定位"])
+    if choicen == "使用经纬度定位":
         lat = input("请输入纬度：")
         if lat == "" or abs(lat) > 90:
             print("输入错误")
@@ -623,7 +674,7 @@ if __name__ == '__main__':
         if lon == "" or abs(lon) > 180:
             print("输入错误")
             exit()
-    elif addr == "ip":
+    elif choicen == "使用IP定位":
         pubilc_ip = get_pubilc_ip()
         print(pubilc_ip)
         lon, lat = get_geolocation(pubilc_ip)
@@ -632,22 +683,22 @@ if __name__ == '__main__':
         key = 'a878560f304927262d5bb9876989dac4'  # 替换为你的高德地图API密钥
         lon, lat = get_location_by_amap(addr, key)
         print(lon, lat)
-    curve_ask = input("是否需要绘制图像？(y/n)")
-    if curve_ask == "y":
+    curve_ask = eg.boolbox("是否要生成曲线图？", "StarWalker")
+    if curve_ask:
         curve = True
     else:
         curve = False
-    ask_starchart = input("是否要生成今日的星图？(y/n)")
+    ask_starchart = eg.boolbox("是否要生成星图？", "StarWalker")
 
     # 覆写
 
     # lon = 116.39131  # 经度
     # lat = 39.90764  # 纬度
-    if ask_starchart == 'y':
+    if ask_starchart:
         starchart(lat, lon)
     data = seventimer(lon, lat)
 
-    print_data_in_line(data, lat, lon, curve)
+    make_report(data, lat, lon, curve)
     image = Image.open(image_path)
     eg.msgbox(
         image=image_path,
