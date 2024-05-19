@@ -6,6 +6,7 @@
 @Desc    :   None
 @Branch  :   Feature-Forward
 """
+
 from datetime import datetime
 from PIL import Image
 import easygui as eg
@@ -56,6 +57,24 @@ def get_moon_phase(hours_after, lat, lon):
     phase_name = ephem.constellation(moon)
 
     return phase
+
+
+def get_geolocation(ip_addr):
+    url = "https://get.geojs.io/v1/ip/geo.json"
+    response = requests.get(url)
+
+    if response.status_code == 200:
+        data = response.json()
+        return data['longitude'], data['latitude']
+
+
+def get_pubilc_ip():
+    url = "http://ipinfo.io/ip"
+    response = requests.get(url)
+    if response.status_code == 200:
+        return response.text.strip()
+    else:
+        return None
 
 
 def newMoonJudge(year, month, day, hour, minute):
@@ -376,6 +395,7 @@ def seventimer(lon, lat):
             else:
                 raise e
 
+
 def describe_weather_condition(score):
     """
 
@@ -593,7 +613,7 @@ if __name__ == '__main__':
     print("版本 ", VERSION)
     print("作者 ", AUTHOR)
     print("编译 ", COMPILED)
-    addr = input("请输入查询地址（不填写则请在下一个输入框中输入经纬度坐标）：")
+    addr = input("请输入查询地址（不填写则请在下一个输入框中输入经纬度坐标 填写<ip>使用智能IP定位）：")
     if addr == "":
         lat = input("请输入纬度：")
         if lat == "" or abs(lat) > 90:
@@ -603,6 +623,15 @@ if __name__ == '__main__':
         if lon == "" or abs(lon) > 180:
             print("输入错误")
             exit()
+    elif addr == "ip":
+        pubilc_ip = get_pubilc_ip()
+        print(pubilc_ip)
+        lon, lat = get_geolocation(pubilc_ip)
+        print(lon, lat)
+    else:
+        key = 'a878560f304927262d5bb9876989dac4'  # 替换为你的高德地图API密钥
+        lon, lat = get_location_by_amap(addr, key)
+        print(lon, lat)
     curve_ask = input("是否需要绘制图像？(y/n)")
     if curve_ask == "y":
         curve = True
@@ -610,9 +639,6 @@ if __name__ == '__main__':
         curve = False
     ask_starchart = input("是否要生成今日的星图？(y/n)")
 
-    key = 'a878560f304927262d5bb9876989dac4'  # 替换为你的高德地图API密钥
-    lon, lat = get_location_by_amap(addr, key)
-    print(lon, lat)
     # 覆写
 
     # lon = 116.39131  # 经度
