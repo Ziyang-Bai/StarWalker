@@ -362,15 +362,19 @@ def seventimer(lon, lat):
     headers = {
         'Content-Type': 'application/json'
     }
-    response = requests.get(url, params=params, headers=headers)
 
-    if response.status_code == 200:
-        data = json.loads(response.text)
-        return data
-    else:
-        print("请求失败，状态码：", response.status_code)
-        responsecode(response.status_code)
-
+    for i in range(5):
+        try:
+            response = requests.get(url, params=params, headers=headers)
+            response.raise_for_status()
+            data = json.loads(response.text)
+            return data
+        except requests.RequestException as e:
+            print(f"请求失败，重试次数：{i + 1}")
+            if i < 4:
+                time.sleep(2)
+            else:
+                raise e
 
 def describe_weather_condition(score):
     """
@@ -561,14 +565,25 @@ def starchart(lat, lon):
         "consto": "1",
         "imgsize": "1000",
         "moonp": "1"}
-    response = requests.get(url, params=params)
-    soup = BeautifulSoup(response.text, "html.parser")
 
-    img_url = soup.find("img")["src"]
-    img_data = requests.get("http://fourmilab.net" + img_url).content
+    for i in range(5):
+        try:
+            response = requests.get(url, params=params)
+            response.raise_for_status()
+            soup = BeautifulSoup(response.text, "html.parser")
 
-    with open("star_map.png", "wb") as f:
-        f.write(img_data)
+            img_url = soup.find("img")["src"]
+            img_data = requests.get("http://fourmilab.net" + img_url).content
+
+            with open("star_map.png", "wb") as f:
+                f.write(img_data)
+            break
+        except requests.RequestException as e:
+            print(f"请求失败，重试次数：{i + 1}")
+            if i < 4:
+                time.sleep(2)
+            else:
+                raise e
 
 
 if __name__ == '__main__':
