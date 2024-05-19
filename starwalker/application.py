@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*- 
+# -*- coding: utf-8 -*-
 """
 @File    :   application.py
 @Time    :   2024/04/15 09:08:03
@@ -6,38 +6,40 @@
 @Desc    :   None
 @Branch  :   Feature-Forward
 """
+
+from datetime import datetime
+from PIL import Image
+import easygui as eg
+from bs4 import BeautifulSoup
+import matplotlib
+import matplotlib.pyplot as plt
+import ephem
+import time
+import urllib
+import hashlib
+import urllib.parse
+import json
+import pandas
+import requests
+from skyfield.framelib import ecliptic_frame
+from skyfield.api import load
 AUTHOR = "JINGJIAN"
-BRATCH = "Legacy GUI"
-VERSION = "Alpha-24w01a>userdebug:release>v0.1L"
-COMPILED = "TRUE"
-if AUTHOR == "" or AUTHOR == None:
+BRATCH = "Feature-Forward"
+VERSION = "Dev-12c"
+COMPILED = "FALSE"
+if AUTHOR == "" or AUTHOR is None:
     AUTHOR = "JINGJIAN"
-if BRATCH == "" or BRATCH == None:
+if BRATCH == "" or BRATCH is None:
     BRATCH = "Unknown"
-if VERSION == "" or VERSION == None:
+if VERSION == "" or VERSION is None:
     VERSION = "Unknown"
-if COMPILED == "" or COMPILED == None:
+if COMPILED == "" or COMPILED is None:
     COMPILED = "FALSE"
 image_path = ".\\star_map.png"
-from skyfield.api import load
-from skyfield.framelib import ecliptic_frame
-import requests
-import pandas
-import json
-import urllib.parse
-import hashlib
-import urllib
-import time
-import ephem
-from datetime import datetime 
-import matplotlib.pyplot as plt
-import matplotlib
-from bs4 import BeautifulSoup
-import easygui as eg
-from PIL import Image
-matplotlib.rc("font",family='Microsoft YaHei')
+matplotlib.rc("font", family='Microsoft YaHei')
 
-def get_moon_phase(hours_after,lat,lon):
+
+def get_moon_phase(hours_after, lat, lon):
     # 设置观察者的位置
     observer = ephem.Observer()
     observer.lat = lat  # 纬度
@@ -56,6 +58,25 @@ def get_moon_phase(hours_after,lat,lon):
 
     return phase
 
+
+def get_geolocation(ip_addr):
+    url = "https://get.geojs.io/v1/ip/geo.json"
+    response = requests.get(url)
+
+    if response.status_code == 200:
+        data = response.json()
+        return data['longitude'], data['latitude']
+
+
+def get_pubilc_ip():
+    url = "http://ipinfo.io/ip"
+    response = requests.get(url)
+    if response.status_code == 200:
+        return response.text.strip()
+    else:
+        return None
+
+
 def newMoonJudge(year, month, day, hour, minute):
     ts = load.timescale()
     t = ts.utc(year, month, day, hour, minute)
@@ -69,14 +90,16 @@ def newMoonJudge(year, month, day, hour, minute):
     phase = (mlon.degrees - slon.degrees) % 360.0
 
     print('{0:.1f}'.format(phase))
-    if '{0:.1f}'.format(phase) ==0:
+    if '{0:.1f}'.format(phase) == 0:
         return True
     else:
         return False
 
+
 def geodata():
     url = "http://api.geodatasource.com/city"
-    params = { 'key': 'YKWZWPVPQNAOJHWQSNXQ5IBGPSKXETXD', 'format': 'json', 'lat': 37.3861, 'lng': -122.084 }
+    params = {'key': 'YKWZWPVPQNAOJHWQSNXQ5IBGPSKXETXD',
+              'format': 'json', 'lat': 37.3861, 'lng': -122.084}
 
     headers = {
         'Content-Type': 'application/json'
@@ -95,6 +118,7 @@ def geodata():
         print("请求失败，状态码：", response.status_code)
         return None
 
+
 def direction_fullname(direction_abbr):
     direction_dict = {
         'N': '正北风',
@@ -108,6 +132,7 @@ def direction_fullname(direction_abbr):
     }
     return direction_dict.get(direction_abbr, '未知风向')
 
+
 def precipitation_type_translate(prec_type):
     prec_type_dict = {
         'none': '无',
@@ -119,8 +144,9 @@ def precipitation_type_translate(prec_type):
         'hail': '冰雹'
     }
     return prec_type_dict.get(prec_type.lower(), '未知降水类型')
-def direction_to_int(direction_value, is_direction=True):
 
+
+def direction_to_int(direction_value, is_direction=True):
     """
 
     假设一个简单的转换逻辑，如果是方向则映射为1-4的等级，1为最不利，4为最有利。
@@ -131,15 +157,19 @@ def direction_to_int(direction_value, is_direction=True):
 
     if is_direction:  # 假设风向，简化处理
 
-        if direction_value in ['N', 'S']: return 2  # 北南风作为中等影响
+        if direction_value in ['N', 'S']:
+            return 2  # 北南风作为中等影响
 
-        elif direction_value in ['E', 'W']: return 3  # 东西风稍好
+        elif direction_value in ['E', 'W']:
+            return 3  # 东西风稍好
 
-        else: return 4  # 其他（如无风）视为最有利
+        else:
+            return 4  # 其他（如无风）视为最有利
 
     else:  # 对于其他参数，假设是直接的数值或已转换为有利等级
 
         return min(max(int(direction_value), 1), 4)  # 确保在1-4之间
+
 
 def get_location_by_amap(address, key):
     url = f'https://restapi.amap.com/v3/geocode/geo?key={key}&address={address}'
@@ -153,7 +183,16 @@ def get_location_by_amap(address, key):
         return None
 
 
-def weather_score(cloudcover, seeing, transparency, lifted_index, rh2m, wind10m_speed, wind10m_direction, temp2m, prec_type):
+def weather_score(
+        cloudcover,
+        seeing,
+        transparency,
+        lifted_index,
+        rh2m,
+        wind10m_speed,
+        wind10m_direction,
+        temp2m,
+        prec_type):
 
     # 根据天文观测调整权重
 
@@ -163,23 +202,21 @@ def weather_score(cloudcover, seeing, transparency, lifted_index, rh2m, wind10m_
 
         'seeing': 0.3,       # 视宁度次之
 
-        'transparency': 0.4, # 透明度同样重要
+        'transparency': 0.4,  # 透明度同样重要
 
-        'lifted_index': 0.3, # 提升指数对天气稳定性有指示，但影响相对小
+        'lifted_index': 0.3,  # 提升指数对天气稳定性有指示，但影响相对小
 
         'rh2m': -0.5,        # 相对湿度
 
-        'wind10m_speed': -0.3, # 风速影响稳定度
+        'wind10m_speed': -0.3,  # 风速影响稳定度
 
-        'wind10m_direction': 0, # 风向影响局部条件
+        'wind10m_direction': 0,  # 风向影响局部条件
 
         'temp2m': 0,      # 温度对观测设备操作有间接影响
 
         'prec_type': 0.01    # 降水类型，雨雾等会严重影响观测
 
     }
-
-    
 
     # 转换输入为评分贡献值
 
@@ -199,23 +236,20 @@ def weather_score(cloudcover, seeing, transparency, lifted_index, rh2m, wind10m_
 
     temp2m = direction_to_int(temp2m, is_direction=False)
 
-    
-
     # 降水类型需特别处理，如晴天为最佳，其他按不利程度赋值
 
-    if prec_type == 'none': 
+    if prec_type == 'none':
 
         prec_type = 4
 
-    else: 
+    else:
 
         prec_type = 1  # 简化处理，实际可能需要更细致的分类
 
-    
-
     # 计算加权总分
 
-    total_score = sum([weights[key] * value for key, value in locals().items() if key in weights])
+    total_score = sum([weights[key] * value for key,
+                       value in locals().items() if key in weights])
     if prec_type == 4:
 
         total_score += 0.1  # 晴天额外加分
@@ -244,114 +278,125 @@ def weather_score(cloudcover, seeing, transparency, lifted_index, rh2m, wind10m_
         total_score += 0.5
     elif cloudcover == 0:
         total_score += 1
-    
 
     # 返回结果
 
     return round(total_score, 2)
-    
+
 
 def responsecode(code):
-        if code == 100:
-            print('继续')
-        elif code == 101:
-            print('切换协议')
-        elif code == 200:
-            print('成功')
-        elif code == 201:
-            print('创建')
-        elif code == 202:
-            print('已接受')
-        elif code == 203:
-            print('非权威信息')
-        elif code == 204:
-            print('无内容')
-        elif code == 205:
-            print('重置内容')
-        elif code == 206:
-            print('部分内容')
-        elif code == 300:
-            print('多重选择')
-        elif code == 301:
-            print('永久移动')
-        elif code == 302:
-            print('找到')
-        elif code == 303:
-            print('查看其他')
-        elif code == 304:
-            print('未修改')
-        elif code == 307:
-            print('临时重定向')
-        elif code == 308:
-            print('永久重定向')
-        elif code == 400:
-            print('错误请求')
-        elif code == 401:
-            print('未授权')
-        elif code == 403:
-            print('禁止')
-        elif code == 404:
-            print('未找到')
-        elif code == 405:
-            print('方法不允许')
-        elif code == 406:
-            print('不可接受')
-        elif code == 407:
-            print('代理授权 required')
-        elif code == 408:
-            print('请求超时')
-        elif code == 409:
-            print('冲突')
-        elif code == 410:
-            print('已删除')
-        elif code == 411:
-            print('长度 required')
-        elif code == 412:
-            print('前置条件失败')
-        elif code == 413:
-            print('负载过大')
-        elif code == 414:
-            print('URI过长')
-        elif code == 415:
-            print('不支持的媒体类型')
-        elif code == 416:
-            print('范围不可满足')
-        elif code == 417:
-            print('期望失败')
-        elif code == 500:
-            print('内部服务器错误')
-        elif code == 501:
-            print('未实现')
-        elif code == 502:
-            print('无效的网关 常见故障 请重试')
-        elif code == 503:
-            print('服务不可用')
-        elif code == 504:
-            print('网关超时')
-        elif code == 505:
-            print('HTTP版本不受支持')
-        else:
-            print('未知状态码')
-        print("请联系开发者以获取帮助")
-        return None
+    if code == 100:
+        print('继续')
+    elif code == 101:
+        print('切换协议')
+    elif code == 200:
+        print('成功')
+    elif code == 201:
+        print('创建')
+    elif code == 202:
+        print('已接受')
+    elif code == 203:
+        print('非权威信息')
+    elif code == 204:
+        print('无内容')
+    elif code == 205:
+        print('重置内容')
+    elif code == 206:
+        print('部分内容')
+    elif code == 300:
+        print('多重选择')
+    elif code == 301:
+        print('永久移动')
+    elif code == 302:
+        print('找到')
+    elif code == 303:
+        print('查看其他')
+    elif code == 304:
+        print('未修改')
+    elif code == 307:
+        print('临时重定向')
+    elif code == 308:
+        print('永久重定向')
+    elif code == 400:
+        print('错误请求')
+    elif code == 401:
+        print('未授权')
+    elif code == 403:
+        print('禁止')
+    elif code == 404:
+        print('未找到')
+    elif code == 405:
+        print('方法不允许')
+    elif code == 406:
+        print('不可接受')
+    elif code == 407:
+        print('代理授权 required')
+    elif code == 408:
+        print('请求超时')
+    elif code == 409:
+        print('冲突')
+    elif code == 410:
+        print('已删除')
+    elif code == 411:
+        print('长度 required')
+    elif code == 412:
+        print('前置条件失败')
+    elif code == 413:
+        print('负载过大')
+    elif code == 414:
+        print('URI过长')
+    elif code == 415:
+        print('不支持的媒体类型')
+    elif code == 416:
+        print('范围不可满足')
+    elif code == 417:
+        print('期望失败')
+    elif code == 500:
+        print('内部服务器错误')
+    elif code == 501:
+        print('未实现')
+    elif code == 502:
+        print('无效的网关 常见故障 请重试')
+    elif code == 503:
+        print('服务不可用')
+    elif code == 504:
+        print('网关超时')
+    elif code == 505:
+        print('HTTP版本不受支持')
+    else:
+        print('未知状态码')
+    print("请联系开发者以获取帮助")
+    return None
+
+
 def seventimer(lon, lat):
     url = "http://www.7timer.info/bin/astro.php"
-    params = {"lon": lon, "lat": lat, "ac": "0", "unit": "metric", "output": "json", "tzshift": "0"}
+    params = {
+        "lon": lon,
+        "lat": lat,
+        "ac": "0",
+        "unit": "metric",
+        "output": "json",
+        "tzshift": "0"}
     headers = {
         'Content-Type': 'application/json'
     }
-    response = requests.get(url, params=params, headers=headers)
-    
-    if response.status_code == 200:
-        data = json.loads(response.text)
-        return data
-    else:
-        print("请求失败，状态码：", response.status_code)
-        responsecode(response.status_code)
 
-        
+    for i in range(5):
+        try:
+            response = requests.get(url, params=params, headers=headers)
+            response.raise_for_status()
+            data = json.loads(response.text)
+            return data
+        except requests.RequestException as e:
+            print(f"请求失败，重试次数：{i + 1}")
+            if i < 4:
+                time.sleep(2)
+            else:
+                raise e
+
+
 def describe_weather_condition(score):
-
     """
 
     根据天气评分返回对应的天气状况描述。
@@ -393,7 +438,9 @@ def describe_weather_condition(score):
     else:
 
         return "无效的评分，请检查输入是否在0到5之间。"
-def print_data_in_line(data,lat,lon,graph):
+
+
+def print_data_in_line(data, lat, lon, graph):
     timepoint = []
     lunarphase = []
     cloudcover = []
@@ -410,28 +457,44 @@ def print_data_in_line(data,lat,lon,graph):
         for i, item in enumerate(data["dataseries"]):
             if i % 9 == 0:
                 print()
-            print("小时后：",       f"{item['timepoint']:<3}", end="  ")
+            print("小时后：", f"{item['timepoint']:<3}", end="  ")
             timepoint.append(item['timepoint'])
-            print(f'月相：{str(get_moon_phase(item["timepoint"],lat,lon))[:3]}', end="  ")
-            lunarphase.append(get_moon_phase(item["timepoint"],lat,lon))
-            print("云层覆盖：",    f"{item['cloudcover']:<3}", end="  ")
+            print(
+                f'月相：{str(get_moon_phase(item["timepoint"],lat,lon))[:3]}',
+                end="  ")
+            lunarphase.append(get_moon_phase(item["timepoint"], lat, lon))
+            print("云层覆盖：", f"{item['cloudcover']:<3}", end="  ")
             cloudcover.append(item['cloudcover'])
-            print("视宁度：",      f"{item['seeing']:<3}", end="  ")
+            print("视宁度：", f"{item['seeing']:<3}", end="  ")
             seeing.append(item['seeing'])
-            print("透明度：",      f"{item['transparency']:<3}", end="  ")
+            print("透明度：", f"{item['transparency']:<3}", end="  ")
             transparency.append(item['transparency'])
-            print("提升指数：",    f"{item['lifted_index']:<3}", end="  ")
+            print("提升指数：", f"{item['lifted_index']:<3}", end="  ")
             lifted_index.append(item['lifted_index'])
-            print("相对湿度：",    f"{item['rh2m']:<3}", end="  ")
+            print("相对湿度：", f"{item['rh2m']:<3}", end="  ")
             rh2m.append(item['rh2m'])
-            print("风速：",        f"{item['wind10m']['speed']:<3}", end="  ")
+            print("风速：", f"{item['wind10m']['speed']:<3}", end="  ")
             wind10m_speed.append(item['wind10m']['speed'])
-            print("风向：",        f"{direction_fullname(item['wind10m']['direction']):<3}", end="  ")
-            print("温度：",        f"{item['temp2m']:<3}", end="  ")
+            print(
+                "风向：",
+                f"{direction_fullname(item['wind10m']['direction']):<3}",
+                end="  ")
+            print("温度：", f"{item['temp2m']:<3}", end="  ")
             temp2m.append(item['temp2m'])
-            print("预测的降水类型：", f"{precipitation_type_translate(item['prec_type']):<3}")
-            wttrs = weather_score(item['cloudcover'], item['seeing'], item['transparency'], item['lifted_index'], item['rh2m'], item['wind10m']['speed'], item['wind10m']['direction'], item['temp2m'], item['prec_type'])
-            angle = get_moon_phase(item["timepoint"],lat,lon)
+            print(
+                "预测的降水类型：",
+                f"{precipitation_type_translate(item['prec_type']):<3}")
+            wttrs = weather_score(
+                item['cloudcover'],
+                item['seeing'],
+                item['transparency'],
+                item['lifted_index'],
+                item['rh2m'],
+                item['wind10m']['speed'],
+                item['wind10m']['direction'],
+                item['temp2m'],
+                item['prec_type'])
+            angle = get_moon_phase(item["timepoint"], lat, lon)
             if angle < 1:
                 phase = "新月"
                 St = 0
@@ -459,10 +522,21 @@ def print_data_in_line(data,lat,lon,graph):
             else:
                 phase = "新月"
                 St = 0
-            if precipitation_type_translate(item['prec_type']) == "雨" or precipitation_type_translate(item['prec_type']) == '雪':
+            if precipitation_type_translate(
+                    item['prec_type']) == "雨" or precipitation_type_translate(
+                    item['prec_type']) == '雪':
                 St = St + 1
-            wttrs = weather_score(item['cloudcover'], item['seeing'], item['transparency'], item['lifted_index'], item['rh2m'], item['wind10m']['speed'], item['wind10m']['direction'], item['temp2m'], item['prec_type'])
-            
+            wttrs = weather_score(
+                item['cloudcover'],
+                item['seeing'],
+                item['transparency'],
+                item['lifted_index'],
+                item['rh2m'],
+                item['wind10m']['speed'],
+                item['wind10m']['direction'],
+                item['temp2m'],
+                item['prec_type'])
+
             wttrs = wttrs - St
             if wttrs < 0:
                 wttrs = 0
@@ -470,10 +544,10 @@ def print_data_in_line(data,lat,lon,graph):
                 wttrs = 5
             else:
                 wttrs = round(wttrs, 2)
-                
-            print("评分：",        f"{wttrs:<3}"," ",describe_weather_condition(wttrs))
+
+            print("评分：", f"{wttrs:<3}", " ", describe_weather_condition(wttrs))
             score_list.append(wttrs)
-    if graph == True:
+    if graph:
         """
         timepoint = []X
         lunarphase = []X
@@ -485,47 +559,61 @@ def print_data_in_line(data,lat,lon,graph):
         wind10m_speed = []X
         temp2m = []X
         """
-        plt.plot(timepoint,lunarphase,color="blue",label="月相")
-        plt.plot(timepoint,temp2m,color="red",label="气温")
-        plt.plot(timepoint,rh2m,color="green",label="湿度")
-        plt.plot(timepoint,wind10m_speed,color="black",label="风速")
-        plt.plot(timepoint,seeing,color="orange",label="视宁度")
-        plt.plot(timepoint,cloudcover,color="purple",label="云量")
-        plt.plot(timepoint,transparency,color="yellow",label="透明度")
-        plt.plot(timepoint,lifted_index,color="pink",label="抬升指数")
-        plt.plot(timepoint,score_list,color="brown",label="观测评分")
+        # plt.plot(timepoint,lunarphase,color="blue",label="月相")
+        plt.plot(timepoint, temp2m, color="red", label="气温")
+        plt.plot(timepoint, rh2m, color="green", label="湿度")
+        plt.plot(timepoint, wind10m_speed, color="black", label="风速")
+        plt.plot(timepoint, seeing, color="orange", label="视宁度")
+        plt.plot(timepoint, cloudcover, color="purple", label="云量")
+        plt.plot(timepoint, transparency, color="yellow", label="透明度")
+        plt.plot(timepoint, lifted_index, color="pink", label="抬升指数")
+        plt.plot(timepoint, score_list, color="brown", label="观测评分")
         plt.xlabel("时间")
         plt.ylabel("数值")
         plt.title("观测数据")
         plt.legend()
         plt.show()
-def starchart(lat,lon):
-    url = "http://fourmilab.net/cgi-bin/uncgi/Yoursky?fov=1&lat=35&lon=-105&depm=0&consto=1&imgsize=1000&moonp=1"
-    params = {"fov": "1", "lat": lat, "lon": lon, "depm": "0", "consto": "1", "imgsize": "1000","moonp":"1"}
-    response = requests.get(url, params=params)
-    soup = BeautifulSoup(response.text, "html.parser")
-
-    img_url = soup.find("img")["src"]
-    img_data = requests.get("http://fourmilab.net" + img_url).content
-
-    with open("star_map.png", "wb") as f:
-        f.write(img_data)
 
 
+def starchart(lat, lon):
+    url = "http://fourmilab.net/cgi-bin/uncgi/Yoursky"
+    params = {
+        "fov": "1",
+        "lat": lat,
+        "lon": lon,
+        "depm": "0",
+        "consto": "1",
+        "imgsize": "1000",
+        "moonp": "1"}
 
+    for i in range(5):
+        try:
+            response = requests.get(url, params=params)
+            response.raise_for_status()
+            soup = BeautifulSoup(response.text, "html.parser")
 
+            img_url = soup.find("img")["src"]
+            img_data = requests.get("http://fourmilab.net" + img_url).content
+
+            with open("star_map.png", "wb") as f:
+                f.write(img_data)
+            break
+        except requests.RequestException as e:
+            print(f"请求失败，重试次数：{i + 1}")
+            if i < 4:
+                time.sleep(2)
+            else:
+                raise e
 
 
 if __name__ == '__main__':
-    #addr = '北京市海淀区中关村街道'  # 替换为你想要查询的地址
-    eg.msgbox("StarWalker 星行者\n分支 "+BRATCH+"\n版本 "+VERSION+"\n作者 "+AUTHOR+"\n编译 "+COMPILED,title="StarWalker - 星行者")
+    # addr = '北京市海淀区中关村街道'  # 替换为你想要查询的地址
     print("StarWalker 星行者")
-    print("分支 ",BRATCH)
-    print("版本 ",VERSION)
-    print("作者 ",AUTHOR)
-    print("编译 ",COMPILED)
-    #addr = input("请输入查询地址（不填写则请在下一个输入框中输入经纬度坐标）：")
-    eg.choicebox("请选择查询方式：",choices=["经纬度坐标","地址查询","智能IP定位"])
+    print("分支 ", BRATCH)
+    print("版本 ", VERSION)
+    print("作者 ", AUTHOR)
+    print("编译 ", COMPILED)
+    addr = input("请输入查询地址（不填写则请在下一个输入框中输入经纬度坐标 填写<ip>使用智能IP定位）：")
     if addr == "":
         lat = input("请输入纬度：")
         if lat == "" or abs(lat) > 90:
@@ -535,24 +623,36 @@ if __name__ == '__main__':
         if lon == "" or abs(lon) > 180:
             print("输入错误")
             exit()
+    elif addr == "ip":
+        pubilc_ip = get_pubilc_ip()
+        print(pubilc_ip)
+        lon, lat = get_geolocation(pubilc_ip)
+        print(lon, lat)
+    else:
+        key = 'a878560f304927262d5bb9876989dac4'  # 替换为你的高德地图API密钥
+        lon, lat = get_location_by_amap(addr, key)
+        print(lon, lat)
     curve_ask = input("是否需要绘制图像？(y/n)")
     if curve_ask == "y":
         curve = True
     else:
         curve = False
     ask_starchart = input("是否要生成今日的星图？(y/n)")
-    
-    key = 'a878560f304927262d5bb9876989dac4'  # 替换为你的高德地图API密钥
-    lon , lat = get_location_by_amap(addr, key)
-    print(lon,lat)
-    #覆写
 
-    #lon = 116.39131  # 经度
-    #lat = 39.90764  # 纬度
+    # 覆写
+
+    # lon = 116.39131  # 经度
+    # lat = 39.90764  # 纬度
     if ask_starchart == 'y':
-        starchart(lat,lon)
+        starchart(lat, lon)
     data = seventimer(lon, lat)
 
-    print_data_in_line(data,lat,lon,curve)
+    print_data_in_line(data, lat, lon, curve)
     image = Image.open(image_path)
-    eg.msgbox(image=image_path,title="StarWalker - 星行者-图像预览",msg=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + "的星图")
+    eg.msgbox(
+        image=image_path,
+        title="StarWalker - 星行者-图像预览",
+        msg=time.strftime(
+            "%Y-%m-%d %H:%M:%S",
+            time.localtime()) +
+        "的星图")
