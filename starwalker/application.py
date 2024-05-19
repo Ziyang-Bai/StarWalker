@@ -7,9 +7,9 @@
 @Branch  :   Feature-Forward
 """
 AUTHOR = "JINGJIAN"
-BRATCH = "Feature-Forward"
-VERSION = "Dev-12c"
-COMPILED = "FALSE"
+BRATCH = "Legacy GUI"
+VERSION = "Alpha-24w01a>userdebug:release>v0.1L"
+COMPILED = "TRUE"
 if AUTHOR == "" or AUTHOR == None:
     AUTHOR = "JINGJIAN"
 if BRATCH == "" or BRATCH == None:
@@ -516,14 +516,16 @@ def starchart(lat,lon):
 
 
 
-if __name__ == '__main__':            
+if __name__ == '__main__':
     #addr = '北京市海淀区中关村街道'  # 替换为你想要查询的地址
+    eg.msgbox("StarWalker 星行者\n分支 "+BRATCH+"\n版本 "+VERSION+"\n作者 "+AUTHOR+"\n编译 "+COMPILED,title="StarWalker - 星行者")
     print("StarWalker 星行者")
     print("分支 ",BRATCH)
     print("版本 ",VERSION)
     print("作者 ",AUTHOR)
     print("编译 ",COMPILED)
-    addr = input("请输入查询地址（不填写则请在下一个输入框中输入经纬度坐标）：")
+    #addr = input("请输入查询地址（不填写则请在下一个输入框中输入经纬度坐标）：")
+    eg.choicebox("请选择查询方式：",choices=["经纬度坐标","地址查询","智能IP定位"])
     if addr == "":
         lat = input("请输入纬度：")
         if lat == "" or abs(lat) > 90:
