@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="d88a91da-c0fb-4702-ad23-c63e884bb7ca" name="更改" comment="增加IP智能定位功能&#10;实测偏移量竟达13km" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;Ziyang-Bai&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/Ziyang-Bai/StarWalker.git&quot;,
+    &quot;accountId&quot;: &quot;f99b4bde-b22d-4481-b668-d2b6047cc1a3&quot;
+  }
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 3
+}</component>
+  <component name="ProjectId" id="2gf525UbtLd0PT3d3mYbIQ8TbpQ" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python.application.executor": "Run",
+    "Python.b_koiv.executor": "Run",
+    "Python.demo.executor": "Run",
+    "Python.ui_demo.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "Feature-Forward",
+    "last_opened_file_path": "E:/Windows/Doc/GitHub/StarWalker/venv/Scripts/autopep8.exe",
+    "settings.editor.selected.configurable": "preferences.externalTools"
+  }
+}]]></component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-python-sdk-babbdf50b680-746f403e7f0c-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-241.15989.155" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="应用程序级" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="默认任务">
+      <changelist id="d88a91da-c0fb-4702-ad23-c63e884bb7ca" name="更改" comment="" />
+      <created>1716075583704</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1716075583704</updated>
+    </task>
+    <task id="LOCAL-00001" summary="- 调整代码风格，优化变量命名&#10;- 添加星图预览功能，提升用户体验&#10;- 修改评分系统，调整天气权重&#10;- 增加调试代码说明，设定常量&#10;- 创建月相角评估算法模块">
+      <option name="closed" value="true" />
+      <created>1716082472448</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1716082472448</updated>
+    </task>
+    <task id="LOCAL-00002" summary="优化请求重试逻辑，增强星图预览功能，调整天气评分权重">
+      <option name="closed" value="true" />
+      <created>1716084309068</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1716084309068</updated>
+    </task>
+    <task id="LOCAL-00003" summary="增加IP智能定位功能&#10;实测偏移量竟达13km">
+      <option name="closed" value="true" />
+      <created>1716089111092</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1716089111092</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
+    <servers />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Use The visual" />
+    <MESSAGE value="- 调整代码风格，优化变量命名&#10;- 添加星图预览功能，提升用户体验&#10;- 修改评分系统，调整天气权重&#10;- 增加调试代码说明，设定常量&#10;- 创建月相角评估算法模块" />
+    <MESSAGE value="优化请求重试逻辑，增强星图预览功能，调整天气评分权重" />
+    <MESSAGE value="增加IP智能定位功能&#10;实测偏移量竟达13km" />
+    <option name="LAST_COMMIT_MESSAGE" value="增加IP智能定位功能&#10;实测偏移量竟达13km" />
+  </component>
+</project>
