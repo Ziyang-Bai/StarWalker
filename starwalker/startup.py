@@ -21,7 +21,7 @@ def showWelcome():
                            fg='black', bg='lightgray', font=('Microsoft YaHei UI Light', 10))
     lb_welcometext.place(x=0, y=143, width=475, height=100)
 
-    # Schedule the root window to be destroyed after 5 seconds
+    # Schedule the root window to   be destroyed after 5 seconds
     root.after(5000, perform_other_tasks)
 
 
