@@ -330,7 +330,7 @@ def responsecode(code):
     elif code == 406:
         print('不可接受')
     elif code == 407:
-        print('代理授权 required')
+        print('需要代理授权')
     elif code == 408:
         print('请求超时')
     elif code == 409:
@@ -338,7 +338,7 @@ def responsecode(code):
     elif code == 410:
         print('已删除')
     elif code == 411:
-        print('长度 required')
+        print('需要长度')
     elif code == 412:
         print('前置条件失败')
     elif code == 413:
