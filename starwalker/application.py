@@ -583,7 +583,6 @@ def make_report(data, lat, lon, graph):
     with open("report.txt", "r", encoding="utf-8") as f:
         content = f.read()
 
-    eg.msgbox(content, "StarWalker")
     if graph:
         """
         timepoint = []X
@@ -655,17 +654,14 @@ if __name__ == '__main__':
         with open("report.txt", "w", encoding="utf-8") as f:
             pass
     # 显示欢迎信息
-    eg.msgbox(
-        f"欢迎使用StarWalker星行者\n分支：{BRATCH}\n版本：{VERSION}\n作者：{AUTHOR}\n编译：{COMPILED}",
-        image="starwalker - Copy.bmp")
     # addr = '北京市海淀区中关村街道'  # 替换为你想要查询的地址
     print("StarWalker 星行者")
     print("分支 ", BRATCH)
     print("版本 ", VERSION)
     print("作者 ", AUTHOR)
     print("编译 ", COMPILED)
-    choicen = eg.choicebox("请选择查询方式", choices=["使用IP定位", "使用经纬度定位", "使用地址定位"])
-    if choicen == "使用经纬度定位":
+    choicen = input("请选择查询方式"+"1使用IP定位"+"2使用经纬度定位"+"3使用地址定位")
+    if choicen == "2":
         lat = input("请输入纬度：")
         if lat == "" or abs(lat) > 90:
             print("输入错误")
@@ -674,27 +670,28 @@ if __name__ == '__main__':
         if lon == "" or abs(lon) > 180:
             print("输入错误")
             exit()
-    elif choicen == "使用IP定位":
+    elif choicen == "1":
         pubilc_ip = get_pubilc_ip()
         print(pubilc_ip)
         lon, lat = get_geolocation(pubilc_ip)
         print(lon, lat)
     else:
+        addr = input("请输入地址：")
         key = 'a878560f304927262d5bb9876989dac4'  # 替换为你的高德地图API密钥
         lon, lat = get_location_by_amap(addr, key)
         print(lon, lat)
-    curve_ask = eg.boolbox("是否要生成曲线图？", "StarWalker")
+    curve_ask = input("是否要生成曲线图？"+"True/False")
     if curve_ask:
-        curve = True
+        curve = "True"
     else:
-        curve = False
-    ask_starchart = eg.boolbox("是否要生成星图？", "StarWalker")
+        curve = "False"
+    ask_starchart = input("是否要生成星图？"+"True/False")
 
     # 覆写
 
     # lon = 116.39131  # 经度
     # lat = 39.90764  # 纬度
-    if ask_starchart:
+    if ask_starchart == "True":
         starchart(lat, lon)
     data = seventimer(lon, lat)
 
