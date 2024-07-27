@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from tkinter import *
 import os
 from time import *
@@ -33,7 +34,7 @@ def showWelcome():
 
 def perform_other_tasks():
     # Start Up the starwalker
-    print("Performing other tasks...")
+    
     sleep(1)
     root.destroy()
 

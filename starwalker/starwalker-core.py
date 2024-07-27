@@ -1,11 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-@File    :   application.py
-@Time    :   2024/04/15 09:08:03
-@Version :   Dev-0.0
-@Desc    :   None
-@Branch  :   Feature-Forward
-"""
 import os
 from datetime import datetime
 from PIL import Image
@@ -23,22 +16,8 @@ import pandas
 import requests
 from skyfield.framelib import ecliptic_frame
 from skyfield.api import load
-AUTHOR = "JINGJIAN"
-BRATCH = "LegacyGUI"
-VERSION = "Alpha-24w01a>userdebug:Rv0.1L"
-COMPILED = "TRUE"
-if AUTHOR == "" or AUTHOR is None:
-    AUTHOR = "JINGJIAN"
-if BRATCH == "" or BRATCH is None:
-    BRATCH = "Unknown"
-if VERSION == "" or VERSION is None:
-    VERSION = "Unknown"
-if COMPILED == "" or COMPILED is None:
-    COMPILED = "FALSE"
 image_path = ".\\star_map.png"
 matplotlib.rc("font", family='Microsoft YaHei')
-
-
 def get_moon_phase(hours_after, lat, lon):
     # 设置观察者的位置
     observer = ephem.Observer()
@@ -145,31 +124,17 @@ def precipitation_type_translate(prec_type):
     }
     return prec_type_dict.get(prec_type.lower(), '未知降水类型')
 
-
+#这个模块已弃用
 def direction_to_int(direction_value, is_direction=True):
-    """
-
-    假设一个简单的转换逻辑，如果是方向则映射为1-4的等级，1为最不利，4为最有利。
-
-    实际应用中需根据具体情况定义。
-
-    """
-
-    if is_direction:  # 假设风向，简化处理
-
+    if is_direction:
         if direction_value in ['N', 'S']:
-            return 2  # 北南风作为中等影响
-
+            return 2
         elif direction_value in ['E', 'W']:
-            return 3  # 东西风稍好
-
+            return 3
         else:
-            return 4  # 其他（如无风）视为最有利
-
-    else:  # 对于其他参数，假设是直接的数值或已转换为有利等级
-
-        return min(max(int(direction_value), 1), 4)  # 确保在1-4之间
-
+            return 4
+    else:
+        return min(max(int(direction_value), 1), 4)
 
 def get_location_by_amap(address, key):
     url = f'https://restapi.amap.com/v3/geocode/geo?key={key}&address={address}'
@@ -193,9 +158,7 @@ def weather_score(
         wind10m_direction,
         temp2m,
         prec_type):
-
     # 根据天文观测调整权重
-
     weights = {
 
         'cloudcover': 1,  # 云量对观测影响大
@@ -219,45 +182,28 @@ def weather_score(
     }
 
     # 转换输入为评分贡献值
-
     cloudcover = direction_to_int(cloudcover)
-
     seeing = direction_to_int(seeing)
-
     transparency = direction_to_int(transparency)
-
     lifted_index = direction_to_int(lifted_index, is_direction=False)
-
     rh2m = direction_to_int(rh2m, is_direction=False)
-
     wind10m_speed = direction_to_int(wind10m_speed, is_direction=False)
-
     wind10m_direction = direction_to_int(wind10m_direction)
-
     temp2m = direction_to_int(temp2m, is_direction=False)
 
     # 降水类型需特别处理，如晴天为最佳，其他按不利程度赋值
 
     if prec_type == 'none':
-
         prec_type = 4
-
     else:
-
         prec_type = 1  # 简化处理，实际可能需要更细致的分类
-
     # 计算加权总分
-
     total_score = sum([weights[key] * value for key,
                        value in locals().items() if key in weights])
     if prec_type == 4:
-
         total_score += 0.1  # 晴天额外加分
-
     elif prec_type == 1:
-
         total_score -= 1  # 雨天减分
-
     if cloudcover == 9:
         total_score -= 1  # 云量大于9时减分
     elif cloudcover == 8:
@@ -278,99 +224,25 @@ def weather_score(
         total_score += 0.5
     elif cloudcover == 0:
         total_score += 1
-
     # 返回结果
-
     return round(total_score, 2)
-
-
 def responsecode(code):
-    if code == 100:
-        print('继续')
-    elif code == 101:
-        print('切换协议')
-    elif code == 200:
-        print('成功')
-    elif code == 201:
-        print('创建')
-    elif code == 202:
-        print('已接受')
-    elif code == 203:
-        print('非权威信息')
-    elif code == 204:
-        print('无内容')
-    elif code == 205:
-        print('重置内容')
-    elif code == 206:
-        print('部分内容')
-    elif code == 300:
-        print('多重选择')
-    elif code == 301:
-        print('永久移动')
-    elif code == 302:
-        print('找到')
-    elif code == 303:
-        print('查看其他')
-    elif code == 304:
-        print('未修改')
-    elif code == 307:
-        print('临时重定向')
-    elif code == 308:
-        print('永久重定向')
-    elif code == 400:
-        print('错误请求')
-    elif code == 401:
-        print('未授权')
-    elif code == 403:
-        print('禁止')
-    elif code == 404:
-        print('未找到')
-    elif code == 405:
-        print('方法不允许')
-    elif code == 406:
-        print('不可接受')
-    elif code == 407:
-        print('需要代理授权')
-    elif code == 408:
-        print('请求超时')
-    elif code == 409:
-        print('冲突')
-    elif code == 410:
-        print('已删除')
-    elif code == 411:
-        print('需要长度')
-    elif code == 412:
-        print('前置条件失败')
-    elif code == 413:
-        print('负载过大')
-    elif code == 414:
-        print('URI过长')
-    elif code == 415:
-        print('不支持的媒体类型')
-    elif code == 416:
-        print('范围不可满足')
-    elif code == 417:
-        print('期望失败')
-    elif code == 500:
-        print('内部服务器错误')
-    elif code == 501:
-        print('未实现')
-    elif code == 502:
-        print('无效的网关 常见故障 请重试')
-    elif code == 503:
-        print('服务不可用')
-    elif code == 504:
-        print('网关超时')
-    elif code == 505:
-        print('HTTP版本不受支持')
-    else:
-        print('未知状态码')
-    print("请联系开发者以获取帮助")
-    return None
-
-
-def seventimer(lon, lat):
-    url = "http://www.7timer.info/bin/astro.php"
+    file_path = './/lib//i18n//zh_cn//http_status_code.json'
+    try:
+        with open(file_path, 'r') as file:
+            descriptions = json.load(file)
+        description = descriptions.get(str(code), '未知状态码')
+        return description
+    except FileNotFoundError:
+        print("文件未找到，请检查文件路径是否正确。")
+        return '未知状态码'
+    except json.JSONDecodeError:
+        print("JSON 解析错误，请检查文件格式是否正确。")
+        return '未知状态码'
+    except Exception as e:
+        print(f"发生错误: {e}")
+        return '未知状态码'
+def seventimer(lon, lat, url):
     params = {
         "lon": lon,
         "lat": lat,
@@ -395,49 +267,38 @@ def seventimer(lon, lat):
             else:
                 raise e
 
-
 def describe_weather_condition(score):
     """
-
     根据天气评分返回对应的天气状况描述。
 
-    :param score: 天气评分，范围通常是0到4。
+    :param score: 天气评分，范围通常是0到5。
 
     :return: 描述天气状况的字符串。
-
     """
+    # 定义 JSON 文件路径
+    file_path = './/lib//i18n//zh_cn//weather_conditions.json'
 
-    if 0 <= score < 0.5:
+    try:
+        # 读取 JSON 文件
+        with open(file_path, 'r', encoding='utf-8') as file:
+            conditions = json.load(file)
 
-        return "糟糕"
+        # 查找最接近的评分
+        closest_score = min(conditions.keys(), key=lambda x: abs(float(x) - score))
+        description = conditions[closest_score]
 
-    elif 0.5 <= score < 1.5:
+        # 返回描述
+        return description
 
-        return "很差"
-
-    elif 1.5 <= score < 2.5:
-
-        return "较差"
-
-    elif 2.5 <= score < 3.5:
-
-        return "尚可"
-
-    elif 3.5 <= score < 3.7:
-
-        return "良好"
-
-    elif 3.7 <= score < 3.9:
-
-        return "很好"
-
-    elif 3.9 <= score <= 5:
-
-        return "极好"
-
-    else:
-
-        return "无效的评分，请检查输入是否在0到5之间。"
+    except FileNotFoundError:
+        print("文件未找到，请检查文件路径是否正确。")
+        return '未知天气状况'
+    except json.JSONDecodeError:
+        print("JSON 解析错误，请检查文件格式是否正确。")
+        return '未知天气状况'
+    except Exception as e:
+        print(f"发生错误: {e}")
+        return '未知天气状况'
 
 
 def make_report(data, lat, lon, graph):
@@ -656,10 +517,6 @@ if __name__ == '__main__':
     # 显示欢迎信息
     # addr = '北京市海淀区中关村街道'  # 替换为你想要查询的地址
     print("StarWalker 星行者")
-    print("分支 ", BRATCH)
-    print("版本 ", VERSION)
-    print("作者 ", AUTHOR)
-    print("编译 ", COMPILED)
     choicen = input("请选择查询方式"+"1使用IP定位"+"2使用经纬度定位"+"3使用地址定位")
     if choicen == "2":
         lat = input("请输入纬度：")
@@ -693,10 +550,9 @@ if __name__ == '__main__':
     # lat = 39.90764  # 纬度
     if ask_starchart == "True":
         starchart(lat, lon)
-    data = seventimer(lon, lat)
-
-    make_report(data, lat, lon, curve)
-    image = Image.open(image_path)
+    data = seventimer(lon, lat, "http://www.7timer.info/bin/astro.php")
+    if curve_ask == "True":
+        make_report(data, lat, lon, curve)
     eg.msgbox(
         image=image_path,
         title="StarWalker - 星行者-图像预览",

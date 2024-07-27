@@ -9,5 +9,7 @@
     "license":"MPL-v2.0",
     "pubilc":"False",
     "platform":"Microsoft Windows",
-    "i18n":"False"
+    "i18n":"False",
+	"lang":"zh_cn",
+    "seventimer":"http://www.7timer.info/bin/astro.php"
 }
