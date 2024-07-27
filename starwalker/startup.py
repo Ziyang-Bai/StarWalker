@@ -7,8 +7,8 @@ def showWelcome():
     sh = root.winfo_screenheight()
     root.overrideredirect(True)
     x = (sw - 475) / 2
-    y = (sh - 200) / 2
-    root.geometry("475x200+%d+%d" % (x, y))
+    y = (sh - 158) / 2
+    root.geometry("475x158+%d+%d" % (x, y))
     root['bg'] = 'lightgray'
 
     if os.path.exists('.//lib//image//starwalker-welcome.png'):
@@ -18,8 +18,8 @@ def showWelcome():
         lb_welcomelogo.place(x=0, y=0)
 
     lb_welcometext = Label(root, text='StarWalker - OpenSource Project - MPL-2.0 licence',
-                           fg='black', bg='lightgray', font=('Microsoft YaHei UI Light', 10))
-    lb_welcometext.place(x=0, y=143, width=475, height=100)
+                           fg='black', bg='lightgray', font=('Courier', 10))
+    lb_welcometext.place(x=0, y=143, width=475, height=15)
 
     # Schedule the root window to   be destroyed after 5 seconds
     root.after(5000, perform_other_tasks)
@@ -28,7 +28,7 @@ def showWelcome():
 def perform_other_tasks():
     # Start Up the starwalker
     print("Performing other tasks...")
-    sleep(50)
+    sleep(1)
     root.destroy()
 
 if __name__ == '__main__':
