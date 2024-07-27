@@ -1,0 +1,13 @@
+{
+    "name" : "Starwalker",
+    "build" : "False",
+    "snapshout":"24w30a",
+    "snapshout-format":"<year>w<week><a-z(26)the snapshout number in this week>",
+    "version" : "Beta Test 1.0",
+    "web" : "https://github.com/Ziyang-Bai/starwalker",
+    "development" : "Python Fotran C",
+    "license":"MPL-v2.0",
+    "pubilc":"False",
+    "platform":"Microsoft Windows",
+    "i18n":"False"
+}
