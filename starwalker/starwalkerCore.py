@@ -502,8 +502,7 @@ def starchart(lat, lon):
             else:
                 raise e
 
-
-if __name__ == '__main__':
+def main():
     if os.path.exists("report.txt"):
         # 如果文件存在，打开文件并清空内容
         with open("report.txt", "r+", encoding="utf-8") as f:
@@ -560,3 +559,6 @@ if __name__ == '__main__':
             "%Y-%m-%d %H:%M:%S",
             time.localtime()) +
         "的星图")
+
+if __name__ == '__main__':
+    main()

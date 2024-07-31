@@ -3,6 +3,7 @@ from tkinter import *
 import os
 from time import *
 import json
+
 def showWelcome():
     sw = root.winfo_screenwidth()
     sh = root.winfo_screenheight()
@@ -29,15 +30,14 @@ def showWelcome():
     lb_welcometext.place(x=0, y=143, width=475, height=15)
 
     # Schedule the root window to   be destroyed after 5 seconds
-    root.after(5000, perform_other_tasks)
+    root.after(5000, main)
 
 
-def perform_other_tasks():
+def main():
     # Start Up the starwalker
-    
-    sleep(1)
+    import starwalkerCore
     root.destroy()
-
+    starwalkerCore.main()
 if __name__ == '__main__':
     root = Tk()
     showWelcome()

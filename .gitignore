@@ -2,3 +2,5 @@ de422.bsp
 report.txt
 star_map.png
 starwalker/build/
+starwalker/__pycache__
+starwalker/report.txt
