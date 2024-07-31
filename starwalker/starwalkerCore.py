@@ -439,10 +439,7 @@ def make_report(data, lat, lon, graph):
                 describe_weather_condition(wttrs) +
                 "\n")
             f.close()
-            # 使用MSGbox显示数据
             score_list.append(wttrs)
-    with open("report.txt", "r", encoding="utf-8") as f:
-        content = f.read()
 
     if graph:
         """
@@ -472,23 +469,32 @@ def make_report(data, lat, lon, graph):
         plt.show()
 
 
-def starchart(lat, lon):
-    url = "http://fourmilab.net/cgi-bin/uncgi/Yoursky"
+def starchart(lat, lon,utctime):
+    url = "http://fourmilab.net/cgi-bin/Yoursky"
+    #UTCtime format <Year>/<Month>/<Day> <Hour>:<Minute>:<Second>
     params = {
-        "fov": "1",
-        "lat": lat,
-        "lon": lon,
-        "depm": "0",
-        "consto": "1",
+        "date": "1",
+        "utc":utctime,
+        "lat": lat + "%B0",
+        "lon": lon + "%B0",
+        "ns":"North",
+        "ew":"East",
+        "deepm": "2.5",
+        "consto": "on",
+        "liamg":"5.5",
+        "starnm":"1",
+        "starbm":"5",
+        "fontscale":"1.0",
+        "scheme":"3",
         "imgsize": "1000",
-        "moonp": "1"}
+        "elements": ""}
 
     for i in range(5):
         try:
             response = requests.get(url, params=params)
             response.raise_for_status()
             soup = BeautifulSoup(response.text, "html.parser")
-
+            print(soup)
             img_url = soup.find("img")["src"]
             img_data = requests.get("http://fourmilab.net" + img_url).content
 
@@ -501,8 +507,7 @@ def starchart(lat, lon):
                 time.sleep(2)
             else:
                 raise e
-
-def main():
+def reportextchk():
     if os.path.exists("report.txt"):
         # 如果文件存在，打开文件并清空内容
         with open("report.txt", "r+", encoding="utf-8") as f:
@@ -513,6 +518,8 @@ def main():
         # 如果文件不存在，创建文件
         with open("report.txt", "w", encoding="utf-8") as f:
             pass
+def main():
+    reportextchk()
     # 显示欢迎信息
     # addr = '北京市海淀区中关村街道'  # 替换为你想要查询的地址
     print("StarWalker 星行者")
