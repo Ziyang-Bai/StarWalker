@@ -1,6 +1,12 @@
 import math
 from skyfield.api import load
+print("阿拉戈克 24w30a v1.0")
+print("项目Github仓库：github.com/ziyang-bai/starwalker")
+print("该程序根据 Mozilla 公共许可证版本 2.0 发布。")
+print("加载星历数据")
 planets = load('de422.bsp')
+print("完成")
+print("开始天体计算")
 ts = load.timescale()
 earth = planets['earth']
 event=[]#不同天体不同状态对应的天象名称
