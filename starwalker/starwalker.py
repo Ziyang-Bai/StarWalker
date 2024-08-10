@@ -16,14 +16,14 @@ def showWelcome():
         with open(".//config//config.json", "r") as f:
             config = json.load(f)
     else:
-        print("!ERROR! THE CONFIG.JSON IS MISSING!")
+        print("FATAL ERROR!config.json does not exist!")
     if os.path.exists('.//lib//image//starwalker-welcome.png'):
         bm = PhotoImage(file='.//lib//image//starwalker-welcome.png')
         lb_welcomelogo = Label(root, image=bm, bg='black')
         lb_welcomelogo.bm = bm
         lb_welcomelogo.place(x=0, y=0)
     else:
-        print("!ERROR! THE STARWALKER-WELCOME.PNG IS MISSING!")
+        print("FATAL ERROR!starwalker-welcome.png starwalker-welcome.png does not exist!")
     lb_welcometext_text = config['name'] + " " + config['version'] + " " + config['snapshout']
     lb_welcometext = Label(root, text=lb_welcometext_text,
                            fg='black', bg='lightgray', font=('Courier', 10))

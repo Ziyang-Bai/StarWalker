@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
-from datetime import datetime
+import datetime
 from PIL import Image
 import easygui as eg
 from bs4 import BeautifulSoup
@@ -23,7 +23,7 @@ def get_moon_phase(hours_after, lat, lon):
     observer = ephem.Observer()
     observer.lat = lat  # 纬度
     observer.lon = lon  # 经度
-    observer.date = datetime.now()
+    observer.date = datetime.datetime.now()
 
     # 计算x个小时后的日期
     future_date = observer.date + ephem.Date(hours_after * ephem.hour)
@@ -38,22 +38,59 @@ def get_moon_phase(hours_after, lat, lon):
     return phase
 
 
-def get_geolocation(ip_addr):
-    url = "https://get.geojs.io/v1/ip/geo.json"
-    response = requests.get(url)
 
-    if response.status_code == 200:
-        data = response.json()
-        return data['longitude'], data['latitude']
+def get_geolocation(ip_addr, max_retries=5, delay=2):
+    url = f"https://get.geojs.io/v1/ip/geo.json"
+    for i in range(max_retries + 1):
+        try:
+            response = requests.get(url)
+            response.raise_for_status()  # Raises an HTTPError for bad responses (4xx or 5xx). 
+            data = response.json()
+            return data['longitude'], data['latitude']
+        except requests.exceptions.HTTPError as errh:
+            print(f"HTTP错误: {errh}")
+            
+        except requests.exceptions.ConnectionError as errc:
+            print(f"错误连接: {errc}")
+            
+        except requests.exceptions.Timeout as errt:
+            print(f"连接超时: {errt}")
+            
+        except requests.exceptions.RequestException as err:
+            print(f"其他错误：{err}")
+            
+        if i < max_retries:
+            wait_time = delay * (2 ** i)  # Exponential backoff
+            print(f"将会在 {wait_time} 秒后重新连接")
+            time.sleep(wait_time)
+    print("多次尝试后未能检索地理位置。")
+    return None, None
 
-
-def get_pubilc_ip():
+def get_pubilc_ip(max_retries=5, delay=2):
     url = "http://ipinfo.io/ip"
-    response = requests.get(url)
-    if response.status_code == 200:
-        return response.text.strip()
-    else:
-        return None
+    for i in range(max_retries + 1):
+        try:
+            response = requests.get(url)
+            response.raise_for_status()  # Raises an HTTPError for bad responses (4xx or 5xx).
+            return response.text.strip()
+        except requests.exceptions.HTTPError as errh:
+            print(f"HTTP 错误: {errh}")
+            
+        except requests.exceptions.ConnectionError as errc:
+            print(f"错误连接: {errc}")
+            
+        except requests.exceptions.Timeout as errt:
+            print(f"连接超时: {errt}")
+            
+        except requests.exceptions.RequestException as err:
+            print(f"其他错误: {err}")
+            
+        if i < max_retries:
+            wait_time = delay * (2 ** i)  # Exponential backoff
+            print(f"正在重试 ({i+1}/{max_retries})，等待 {wait_time} 秒...")
+            time.sleep(wait_time)
+    print("多次尝试后未能获取公共 IP 地址。")
+    return None
 
 
 def newMoonJudge(year, month, day, hour, minute):
@@ -472,11 +509,13 @@ def make_report(data, lat, lon, graph):
 def starchart(lat, lon,utctime):
     url = "http://fourmilab.net/cgi-bin/Yoursky"
     #UTCtime format <Year>/<Month>/<Day> <Hour>:<Minute>:<Second>
+    dmslat = decimal_to_dms(lat)
+    dmslon = decimal_to_dms(lon)
     params = {
         "date": "1",
         "utc":utctime,
-        "lat": lat + "%B0",
-        "lon": lon + "%B0",
+        "lat": dmslat,
+        "lon": dmslon,
         "ns":"North",
         "ew":"East",
         "deepm": "2.5",
@@ -494,7 +533,6 @@ def starchart(lat, lon,utctime):
             response = requests.get(url, params=params)
             response.raise_for_status()
             soup = BeautifulSoup(response.text, "html.parser")
-            print(soup)
             img_url = soup.find("img")["src"]
             img_data = requests.get("http://fourmilab.net" + img_url).content
 
@@ -518,6 +556,20 @@ def reportextchk():
         # 如果文件不存在，创建文件
         with open("report.txt", "w", encoding="utf-8") as f:
             pass
+def decimal_to_dms(degrees):
+    #模块没有按照预期发挥好的作用，暂时不用，直接return
+    # 将十进制度转换为度、分、秒
+    #degrees = float(degrees)
+    #d = float(degrees)
+    #md = abs(degrees - d) * 60
+    #m = float(md)
+    #sd = (md - m) * 60
+    #s = round(sd, 3)
+    #return f"{d}° {m}' {s}\""
+    return str(degrees)+"°"
+def getutctime():
+    #UTCtime format <Year>/<Month>/<Day> <Hour>:<Minute>:<Second>
+    return datetime.datetime.now(datetime.timezone.utc).strftime("%Y/%m/%d %H:%M:%S")
 def main():
     reportextchk()
     # 显示欢迎信息
@@ -555,17 +607,16 @@ def main():
     # lon = 116.39131  # 经度
     # lat = 39.90764  # 纬度
     if ask_starchart == "True":
-        starchart(lat, lon)
+        starchart(lat, lon, getutctime())
     data = seventimer(lon, lat, "http://www.7timer.info/bin/astro.php")
     if curve_ask == "True":
         make_report(data, lat, lon, curve)
+    formatted_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     eg.msgbox(
         image=image_path,
         title="StarWalker - 星行者-图像预览",
-        msg=time.strftime(
-            "%Y-%m-%d %H:%M:%S",
-            time.localtime()) +
-        "的星图")
+        msg=formatted_time + "的星图" + "LON:" + str(decimal_to_dms(float(lon))) + "LAT:" + str(decimal_to_dms(float(lat))))
+
 
 if __name__ == '__main__':
     main()
